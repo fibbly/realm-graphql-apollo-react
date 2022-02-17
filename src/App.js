@@ -5,73 +5,89 @@ import { useQuery, useMutation } from "@apollo/client";
 import { FIND_MOVIE, UPDATE_MOVIE } from "./graphql-operations";
 
 export default function App(props) {
-  const [searchText, setSearchText] = React.useState("The Matrix Reloaded");
-  const { loading, data } = useQuery(FIND_MOVIE, {
-    variables: { query: { title: searchText } }
-  });
+	const [searchText, setSearchText] = React.useState("The Matrix Reloaded");
+	const { loading, data } = useQuery(FIND_MOVIE, {
+		variables: { query: { title: searchText } },
+	});
 
-  const movie = data ? data.movie : null;
-  const [updateMovie, { loading: updating }] = useMutation(UPDATE_MOVIE);
-  const [newTitleText, setNewTitleText] = React.useState("Silly New Title");
+	const movie = data ? data.movie : null;
+	const [updateMovie, { loading: updating }] = useMutation(UPDATE_MOVIE);
+	const [newTitleText, setNewTitleText] = React.useState("Silly New Title");
 
-  const updateMovieTitle = async () => {
-    if (!movie) return;
-    await updateMovie({
-      variables: {
-        query: { title: movie.title },
-        set: { title: newTitleText }
-      }
-    });
-    setSearchText(newTitleText);
-  };
+	const updateMovieTitle = async () => {
+		if (!movie) return;
+		await updateMovie({
+			variables: {
+				query: { title: movie.title },
+				set: { title: newTitleText },
+			},
+		});
+		setSearchText(newTitleText);
+	};
 
-  return (
-    <div className="App">
-      <h1>Find a Movie</h1>
-      <span className="subheading">
-        The app automatically searches as you type
-      </span>
-      <div className="title-input">
-        <input
-          className="fancy-input"
-          value={searchText}
-          onChange={e => setSearchText(e.target.value)}
-          type="text"
-        />
-      </div>
-      {APP_ID === "<Your App ID>" ? (
-        <div className="status important">
-          Replace APP_ID with your App ID in index.js
-        </div>
-      ) : (
-        !loading &&
-        !movie && <div className="status">No movie with that name!</div>
-      )}
-      {movie && (
-        <div>
-          {!updating && (
-            <div className="title-input">
-              <input
-                type="text"
-                className="fancy-input"
-                value={newTitleText}
-                onChange={e => setNewTitleText(e.target.value)}
-              />
-              <button
-                className="fancy-button"
-                onClick={() => updateMovieTitle()}
-              >
-                Change the movie title
-              </button>
-            </div>
-          )}
-          <h2>{movie.title}</h2>
-          <div>Year: {movie.year}</div>
-          <div>Runtime: {movie.runtime} minutes</div>
-          <br />
-          <img alt={`Poster for ${movie.title}`} src={movie.poster} />
-        </div>
-      )}
-    </div>
-  );
+	return (
+		<div className="flex flex-col h-screen p-12">
+			<header className="pb-12 mb-6">
+				<h1 className="text-6xl font-bold text-slate-500">Find a Movie</h1>
+				<span className="text-2xl text-gray-400">
+					The app automatically searches as you type
+				</span>
+			</header>
+			<div className="flex flex-row h-screen">
+				<aside className="flex flex-col w-1/4 border-r-2 pr-12">
+					<input
+						className="border-2 rounded p-2 m-4"
+						value={searchText}
+						onChange={(e) => setSearchText(e.target.value)}
+						type="text"
+					/>
+					{APP_ID === "<Your App ID>" ? (
+						<div className="status important">
+							Replace APP_ID with your App ID in index.js
+						</div>
+					) : (
+						!loading &&
+						!movie && <div className="status">No movie with that name!</div>
+					)}
+					{movie && (
+						<div>
+							{!updating && (
+								<div className="title-input mb-6 flex flex-col">
+									<input
+										type="text"
+										className="border-2 rounded p-2 mx-4"
+										value={newTitleText}
+										onChange={(e) => setNewTitleText(e.target.value)}
+									/>
+									<button
+										className="bg-blue-800 text-zinc-50 rounded p-2 mt-2 mx-4"
+										onClick={() => updateMovieTitle()}
+									>
+										Change the movie title
+									</button>
+								</div>
+							)}
+						</div>
+					)}
+				</aside>
+				<main className="flex px-12 bg-slate-50 w-full">
+					{movie && (
+						<div className="flex flex-row bg-white rounded-xl p-12 my-6 w-full h-1/2">
+							<img
+								alt={`Poster for ${movie.title}`}
+								src={movie.poster}
+								className=""
+							/>
+							<div className="flex flex-col pl-12">
+								<h2 className="text-4xl pb-4">{movie.title}</h2>
+								<div className="pb-2">Year: {movie.year}</div>
+								<div>Runtime: {movie.runtime} minutes</div>
+								<br />
+							</div>
+						</div>
+					)}
+				</main>
+			</div>
+		</div>
+	);
 }

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-.App {
+/* .App {
 	font-family: sans-serif;
 	text-align: center;
 }
@@ -33,4 +33,4 @@
 .important {
 	font-size: 24px;
 	color: red;
-}
+} */
