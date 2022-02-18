@@ -12,6 +12,7 @@ export default function App(props) {
 	});
 
 	const [movie, setMovie] = React.useState([]);
+	const [users, setUsers] = React.useState([]);
 
 	React.useEffect(() => {
 		const movieData = data?.movie ? [data.movie] : [];
@@ -34,9 +35,10 @@ export default function App(props) {
 		setSearchText(newTitleText);
 	};
 
-	async function getComedies() {
-		const comedies = await app.currentUser.callFunction("getComedies");
-		setMovie(comedies);
+	async function getData() {
+		const response = await app.currentUser.callFunction("getComedies");
+		setMovie(response["movies"]);
+		setUsers(response["users"]);
 	}
 
 	return (
@@ -84,7 +86,7 @@ export default function App(props) {
 									<div className="flex flex-col">
 										<button
 											className="bg-sky-500 text-zinc-50 rounded p-2 mt-2 mx-4"
-											onClick={() => getComedies()}
+											onClick={() => getData()}
 										>
 											Get Comedies
 										</button>
@@ -98,7 +100,7 @@ export default function App(props) {
 					{movie &&
 						movie.length > 0 &&
 						movie.map((movie, _) => (
-							<MovieCard key={movie._id} movie={movie} />
+							<MovieCard key={movie._id} movie={movie} users={users} />
 						))}
 				</main>
 			</div>
