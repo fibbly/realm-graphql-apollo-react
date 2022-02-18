@@ -26,7 +26,7 @@ import App from "./App";
 export const APP_ID = process.env.REACT_APP_APP_ID;
 
 // Connect to your MongoDB Realm app
-const app = new Realm.App(APP_ID);
+export const app = new Realm.App(APP_ID);
 
 // Gets a valid Realm user access token to authenticate requests
 async function getValidAccessToken() {

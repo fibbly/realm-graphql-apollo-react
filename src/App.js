@@ -1,8 +1,9 @@
 import "./styles.css";
 import * as React from "react";
-import { APP_ID } from "./index";
+import { APP_ID, app } from "./index";
 import { useQuery, useMutation } from "@apollo/client";
 import { FIND_MOVIE, UPDATE_MOVIE } from "./graphql-operations";
+import MovieCard from "./MovieCard";
 
 export default function App(props) {
 	const [searchText, setSearchText] = React.useState("The Matrix Reloaded");
@@ -10,7 +11,15 @@ export default function App(props) {
 		variables: { query: { title: searchText } },
 	});
 
-	const movie = data ? data.movie : null;
+	const [movie, setMovie] = React.useState([]);
+
+	React.useEffect(() => {
+		const movieData = data?.movie ? [data.movie] : [];
+		// console.log("setMovie", movieData);
+		setMovie(movieData);
+	}, [data]);
+
+	//let movie = data ? data.movie : null;
 	const [updateMovie, { loading: updating }] = useMutation(UPDATE_MOVIE);
 	const [newTitleText, setNewTitleText] = React.useState("Silly New Title");
 
@@ -24,6 +33,11 @@ export default function App(props) {
 		});
 		setSearchText(newTitleText);
 	};
+
+	async function getComedies() {
+		const comedies = await app.currentUser.callFunction("getComedies");
+		setMovie(comedies);
+	}
 
 	return (
 		<div className="flex flex-col h-screen p-12">
@@ -52,40 +66,40 @@ export default function App(props) {
 					{movie && (
 						<div>
 							{!updating && (
-								<div className="title-input mb-6 flex flex-col">
-									<input
-										type="text"
-										className="border-2 rounded p-2 mx-4"
-										value={newTitleText}
-										onChange={(e) => setNewTitleText(e.target.value)}
-									/>
-									<button
-										className="bg-blue-800 text-zinc-50 rounded p-2 mt-2 mx-4"
-										onClick={() => updateMovieTitle()}
-									>
-										Change the movie title
-									</button>
+								<div>
+									<div className="title-input mb-6 flex flex-col pb-6 border-b-2">
+										<input
+											type="text"
+											className="border-2 rounded p-2 mx-4"
+											value={newTitleText}
+											onChange={(e) => setNewTitleText(e.target.value)}
+										/>
+										<button
+											className="bg-blue-800 text-zinc-50 rounded p-2 mt-2 mx-4"
+											onClick={() => updateMovieTitle()}
+										>
+											Change the movie title
+										</button>
+									</div>
+									<div className="flex flex-col">
+										<button
+											className="bg-sky-500 text-zinc-50 rounded p-2 mt-2 mx-4"
+											onClick={() => getComedies()}
+										>
+											Get Comedies
+										</button>
+									</div>
 								</div>
 							)}
 						</div>
 					)}
 				</aside>
-				<main className="flex px-12 bg-slate-50 w-full">
-					{movie && (
-						<div className="flex flex-row bg-white rounded-xl p-12 my-6 w-full h-1/2">
-							<img
-								alt={`Poster for ${movie.title}`}
-								src={movie.poster}
-								className=""
-							/>
-							<div className="flex flex-col pl-12">
-								<h2 className="text-4xl pb-4">{movie.title}</h2>
-								<div className="pb-2">Year: {movie.year}</div>
-								<div>Runtime: {movie.runtime} minutes</div>
-								<br />
-							</div>
-						</div>
-					)}
+				<main className="flex flex-col px-12 bg-slate-50 w-full overflow-scroll">
+					{movie &&
+						movie.length > 0 &&
+						movie.map((movie, _) => (
+							<MovieCard key={movie._id} movie={movie} />
+						))}
 				</main>
 			</div>
 		</div>
